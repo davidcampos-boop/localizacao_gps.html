@@ -107,7 +107,6 @@
            cepSpan.textContent = "";
            resultado.style.display = "block";
            mostrarMensagem("");
-           // Reverso no OpenStreetMap
            const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=jsonv2`;
            fetch(url)
                .then(resp => resp.json())
@@ -115,7 +114,7 @@
                    if (data) {
                        enderecoTxt = data.display_name || "";
                        const adr = data.address || {};
-                       cidadeTxt = adr.city || adr.town || adr.village || adr.suburb || "";
+                       cidadeTxt = adr.city || adr.town || adr.village || adr.suburb || adr.county || "";
                        estadoTxt = adr.state || "";
                        cepTxt = adr.postcode || "";
                        enderecoSpan.textContent = enderecoTxt || "Endereço não encontrado.";
