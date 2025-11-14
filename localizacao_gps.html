@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>Registro com Localização</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+<h2>Registro com Localização Automática</h2>
+<p id="status">Tentando obter sua localização... autorize o uso de localização no seu celular.</p>
+<form id="formDados" onsubmit="enviarEmail(event)">
+<label for="lat">Latitude:</label><br>
+<input type="text" id="lat" readonly /><br><br>
+<label for="lon">Longitude:</label><br>
+<input type="text" id="lon" readonly /><br><br>
+<button type="submit" id="botaoEnviar" disabled>Enviar localização</button>
+</form>
+<script>
+   const statusEl = document.getElementById('status');
+   const botao = document.getElementById('botaoEnviar');
+   const latInput = document.getElementById('lat');
+   const lonInput = document.getElementById('lon');
+   function sucesso(pos) {
+     const crd = pos.coords;
+     latInput.value = crd.latitude.toFixed(6);
+     lonInput.value = crd.longitude.toFixed(6);
+     statusEl.textContent = 'Localização obtida com sucesso! Clique em Enviar localização.';
+     botao.disabled = false;
+   }
+   function erro(err) {
+     statusEl.textContent = 'Não consegui obter sua localização (' + err.message + ').';
+     botao.disabled = false;
+   }
+   if (navigator.geolocation) {
+     navigator.geolocation.getCurrentPosition(sucesso, erro, {
+       enableHighAccuracy: true,
+       timeout: 15000
+     });
+   } else {
+     statusEl.textContent = 'Seu navegador não suporta geolocalização.';
+     botao.disabled = false;
+   }
+   function encode(v) {
+     return encodeURIComponent(v || '');
+   }
+   function enviarEmail(e) {
+     e.preventDefault();
+     const lat = latInput.value || 'SEM_LAT';
+     const lon = lonInput.value || 'SEM_LON';
+     // ASSUNTO padronizado para o Power Automate
+     // FORMGPS|lat|lon
+     const assunto = 'FORMGPS|' + lat + '|' + lon;
+     const corpo =
+       'Localização registrada por Thiago (thiago.alves.th89@gmail.com)\n\n' +
+       'Latitude: ' + lat + '\n' +
+       'Longitude: ' + lon + '\n';
+     // ✅ Seu e-mail corporativo aqui
+     const emailDestino = 'david.campos@portosudeste.com';
+     const mailtoLink = 'mailto:' + emailDestino +
+       '?subject=' + encode(assunto) +
+       '&body=' + encode(corpo);
+     window.location.href = mailtoLink;
+   }
+</script>
+</body>
+</html>
