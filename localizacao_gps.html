@@ -49,6 +49,10 @@
 </p>
 <button id="btnLocalizar">Obter localização</button>
 <div id="resultado" style="display:none;">
+<p><span class="label">Endereço:</span><br><span id="endereco"></span></p>
+<p><span class="label">Cidade:</span> <span id="cidade"></span></p>
+<p><span class="label">Estado:</span> <span id="estado"></span></p>
+<p><span class="label">CEP:</span> <span id="cep"></span></p>
 <p><span class="label">Latitude:</span> <span id="lat"></span></p>
 <p><span class="label">Longitude:</span> <span id="lon"></span></p>
 <button id="btnCopiar">Copiar tudo</button>
@@ -59,10 +63,18 @@
        const btnLocalizar = document.getElementById("btnLocalizar");
        const resultado = document.getElementById("resultado");
        const msg = document.getElementById("mensagem");
+       const enderecoSpan = document.getElementById("endereco");
+       const cidadeSpan = document.getElementById("cidade");
+       const estadoSpan = document.getElementById("estado");
+       const cepSpan = document.getElementById("cep");
        const latSpan = document.getElementById("lat");
        const lonSpan = document.getElementById("lon");
        const btnCopiar = document.getElementById("btnCopiar");
        const status = document.getElementById("status");
+       let enderecoTxt = "";
+       let cidadeTxt = "";
+       let estadoTxt = "";
+       let cepTxt = "";
        let latFmt = "";
        let lonFmt = "";
        function mostrarMensagem(texto) {
@@ -90,6 +102,9 @@
            latSpan.textContent = latFmt;
            lonSpan.textContent = lonFmt;
            enderecoSpan.textContent = "Buscando endereço aproximado...";
+           cidadeSpan.textContent = "";
+           estadoSpan.textContent = "";
+           cepSpan.textContent = "";
            resultado.style.display = "block";
            mostrarMensagem("");
            const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=jsonv2`;
@@ -99,7 +114,13 @@
                    if (data) {
                        enderecoTxt = data.display_name || "";
                        const adr = data.address || {};
+                       cidadeTxt = adr.city || adr.town || adr.village || adr.suburb || adr.county || "";
+                       estadoTxt = adr.state || "";
+                       cepTxt = adr.postcode || "";
                        enderecoSpan.textContent = enderecoTxt || "Endereço não encontrado.";
+                       cidadeSpan.textContent = cidadeTxt;
+                       estadoSpan.textContent = estadoTxt;
+                       cepSpan.textContent = cepTxt;
                    } else {
                        enderecoSpan.textContent = "Endereço não encontrado. Use apenas as coordenadas.";
                    }
@@ -109,9 +130,9 @@
                });
            btnCopiar.onclick = () => {
                // ORDEM EXATA PARA O POWER AUTOMATE:
-               // Latitude ; Longitude
+               // Endereço ; Cidade ; Estado ; Cep ; Latitude ; Longitude
                const textoCopiar =
-                   `${cepTxt};${latFmt};${lonFmt}`;
+                   `${enderecoTxt};${cidadeTxt};${estadoTxt};${cepTxt};${latFmt};${lonFmt}`;
                if (navigator.clipboard && navigator.clipboard.writeText) {
                    navigator.clipboard.writeText(textoCopiar)
                        .then(() => {
@@ -140,4 +161,3 @@
 </script>
 </body>
 </html>
-
